@@ -1,31 +1,29 @@
-import db from '../../../lib/db';
+import mysql from 'mysql2/promise';
 import { NextResponse } from 'next/server';
 
 export async function GET(req) {
-  const { searchParams } = new URL(req.url);
-  const search = searchParams.get('search') || '';
-  const sort = searchParams.get('sort') || 'newest';
-
   try {
-    // CẬP NHẬT: Sử dụng LEFT JOIN để lấy tên danh mục từ bảng categories
-    // p.* là lấy tất cả cột của products, c.name là lấy tên danh mục
-    let query = `
-      SELECT p.*, c.name as category_name 
-      FROM products p 
-      LEFT JOIN categories c ON p.category_id = c.id 
-      WHERE p.name LIKE ?
-    `;
-    let params = [`%${search}%`];
+    // Kết nối thẳng tới TiDB Cloud
+    const connection = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      ssl: {
+        rejectUnauthorized: false // Bắt buộc phải có dòng này cho TiDB
+      }
+    });
 
-    // Xử lý sắp xếp (Thêm alias p. để SQL biết là lấy cột của bảng products)
-    if (sort === 'price_asc') query += ' ORDER BY p.price ASC';
-    else if (sort === 'price_desc') query += ' ORDER BY p.price DESC';
-    else query += ' ORDER BY p.id DESC';
+    // Lấy dữ liệu giày
+    const [rows] = await connection.execute('SELECT * FROM products');
+    
+    // Đóng kết nối ngay sau khi lấy xong
+    await connection.end();
 
-    const [rows] = await db.execute(query, params);
     return NextResponse.json(rows);
   } catch (error) {
-    console.error("Lỗi API Products:", error.message);
+    console.error("Lỗi kết nối database:", error.message);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
