@@ -1,0 +1,15 @@
+// src/lib/db.js
+import mysql from 'mysql2/promise';
+
+const pool = mysql.createPool({
+  host: '127.0.0.1',  
+  user: 'root',
+  password: '',       
+  database: 'academy_shop',
+  port: 3307,         
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+});
+
+export default pool;
