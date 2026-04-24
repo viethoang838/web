@@ -1,15 +1,11 @@
-// src/lib/db.js
-import mysql from 'mysql2/promise';
-
-const pool = mysql.createPool({
-  host: '127.0.0.1',  
-  user: 'root',
-  password: '',       
-  database: 'academy_shop',
-  port: 3307,         
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+const connection = mysql.createConnection({
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  ssl: {
+    minVersion: 'TLSv1.2',
+    rejectUnauthorized: true
+  }
 });
-
-export default pool;
