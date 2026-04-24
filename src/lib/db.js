@@ -1,7 +1,6 @@
-// Đảm bảo bạn đã import/require mysql2 hoặc mysql
-const mysql = require('mysql2'); // hoặc mysql
+import mysql from 'mysql2/promise';
 
-const connection = mysql.createConnection({
+const db = mysql.createPool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
   user: process.env.DB_USER,
@@ -9,9 +8,11 @@ const connection = mysql.createConnection({
   database: process.env.DB_NAME,
   ssl: {
     minVersion: 'TLSv1.2',
-    rejectUnauthorized: true
-  }
+    rejectUnauthorized: false // Cho phép kết nối an toàn với TiDB
+  },
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
 
-// Nhớ xuất connection ra nếu file khác cần dùng
-module.exports = connection;
+export default db;
