@@ -1,3 +1,6 @@
+// Đảm bảo bạn đã import/require mysql2 hoặc mysql
+const mysql = require('mysql2'); // hoặc mysql
+
 const connection = mysql.createConnection({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
@@ -9,3 +12,6 @@ const connection = mysql.createConnection({
     rejectUnauthorized: true
   }
 });
+
+// Nhớ xuất connection ra nếu file khác cần dùng
+module.exports = connection;
